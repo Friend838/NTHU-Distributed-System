@@ -38,6 +38,7 @@ type PrometheusServiceMeter struct {
 	requestCounter syncint64.Counter
 	// TODO
 	responseTimeHistogram syncint64.Histogram
+	errorRequestCounter   syncint64.Counter
 }
 
 // UnaryServerInterceptor is a gRPC server-side interceptor that provides Prometheus monitoring for Unary RPCs.
@@ -56,6 +57,9 @@ func (m *PrometheusServiceMeter) UnaryServerInterceptor() func(ctx context.Conte
 
 		// update error request counter when error occurs
 		// TODO
+		if err != nil {
+			m.errorRequestCounter.Add(ctx, 1, attributes...)
+		}
 
 		// measure response time
 		responseTime := time.Since(start)
@@ -88,6 +92,10 @@ func NewPrometheusServiceMeter(ctx context.Context, conf *PrometheusServiceMeter
 
 	// initiate error request counter
 	// TODO
+	errorRequestCounter, err := meter.SyncInt64().Counter("error_request", instrument.WithDescription("count number of error requests"))
+	if err != nil {
+		logger.Fatal("failed to create error requests counter", zap.Error(err))
+	}
 
 	responseTimeHistogram, err := meter.SyncInt64().Histogram("response_time", instrument.WithDescription("measure response time"))
 	if err != nil {
@@ -99,6 +107,7 @@ func NewPrometheusServiceMeter(ctx context.Context, conf *PrometheusServiceMeter
 		requestCounter: requestCounter,
 		// TODO
 		responseTimeHistogram: responseTimeHistogram,
+		errorRequestCounter:   errorRequestCounter,
 	}
 }
 

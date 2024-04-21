@@ -4,6 +4,13 @@ The repository includes microservices for the NTHU Distributed System course lab
 
 Before going through the following parts, make sure your Docker is running since we are generating/testing/building code inside a Docker container to prevent dependencies from conflicting/missing on your host machine.
 
+## Lab Prometheus Result
+- Test your implementation in the otelkit package
+![alt text](./imgs/img1.png)
+- Verify your implementation of the interceptor
+I try the following api: `http://localhost:10081/v1/comments/1`
+![alt text](./imgs/img2.png)
+
 ## Features
 
 The video service serves APIs that accept uploading a video, listing videos, getting a video and deleting a video.
